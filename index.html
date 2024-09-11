@@ -13,12 +13,25 @@
     </style>
 </head>
 <body>
-    <div class="responsive-container">
-        <button id="cornerButton">Generate Tissue</button>
-        <button id="topBar">Generate Tissue</button>
+    <div class="control-container">
+        <div class="button-container">
+            <button class="button" id="generate-tissue">Yeni Doku Üret</button>
+            <button class="button" id="move-tissue">Dokuyu Hareket Ettir</button>
+        </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="matter.js"></script>
+    <div class="prediction-window">
+        <div class="prediction-header">İstatistikler</div>
+        <div id="detected-opacity">Şeffaflık: 0.5</div>
+
+        <div class="debug-options">
+            <div class="debug-option">
+                <input type="checkbox" id="debug-1">
+                <label for="debug-1">Algılanan Dokuyu Göster</label>
+            </div>
+        </div>
+    </div>
+    <script src="resources/packages/three.min.js"></script>
+    <script src="resources/packages/matter.min.js"></script>
     <script src="index.js"></script>
 </body>
 </html>

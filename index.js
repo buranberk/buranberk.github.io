@@ -41,13 +41,11 @@ function coordinatesFromOffset(offsets) {
 
 function generateRandomOffsets(length,base) {
     const offsets = Array(length);
-    // generate random points to interpolate
     const main_offsets = Array(Math.floor(length / 40));
     for (let i = 0; i < main_offsets.length; i++) {
         main_offsets[i] = Math.random()*(base/2);
     }
     let sampforoffset=Math.floor(length/main_offsets.length)
-    // interpolate between the random points
     for (let i = 0;i<main_offsets.length;i++){
         for (let j = 0; j < sampforoffset; j++) {
             const t = j / sampforoffset;
@@ -76,27 +74,14 @@ function generateTissue() {
         verts.push({ x: polygon_points[i][0], y: polygon_points[i][1] });
     }
 
-    //let polygonBody = Matter.Bodies.polygon(0, 0, polygon_points.length, 50, { isStatic: false });
     var polygonBody = Matter.Body.create({
         position: { x: 0, y: 0 },
         vertices: verts,
         isStatic: false
     });
     Matter.World.add(world, polygonBody);
-    // mouse control
-    let mouse = Matter.Mouse.create(renderer.domElement);
-    let mouseConstraint = Matter.MouseConstraint.create(engine, { mouse: mouse });
-    Matter.World.add(world, mouseConstraint);
-    // drag polygon
-    Matter.Events.on(mouseConstraint, 'mousedown', function(event) {
-        //Matter.Body.setVelocity(polygonBody, { x: -Math.min(Math.max(-mouse.position.x+window.innerWidth/2.0,-10.0),10.0), y: Math.min(Math.max(-mouse.position.y+window.innerHeight/2.0,-10.0),10.0) });
-        //Matter.Body.setVelocity(polygonBody, { x: (Math.random()-.5)*30.0, y: (Math.random()-0.5)*10.0 });
-        // apply force
-        Matter.Body.applyForce(polygonBody, { x: 0, y: 0 }, { x:(Math.random()-.5)*1.5, y: (Math.random()-.5)*1.0 });
-        //Matter.Body.setAngularVelocity(polygonBody, (Math.random()-.5)*0.2);
-        //Matter.Body.setPosition(polygonBody, { x: mouse.position.x-window.innerWidth/2, y: window.innerHeight/2-mouse.position.y });
-    });
-    tissue={polygon:polygon,polygonBody:polygonBody};
+
+    tissue={polygon:polygon,polygonBody:polygonBody,opacity:1.0};
 }
 
 function transformPoint2Casette(pt){   
@@ -133,10 +118,9 @@ function setupTHREE() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xffffff);
 
-    // 3. Create a plane to render the blurred texture
     blur_screen = new THREE.Scene();
     blur_screen.background = new THREE.Color(0xffffff);
-    const quadGeometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight); // Fullscreen quad
+    const quadGeometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
     const quad = new THREE.Mesh(quadGeometry, secondShader);
     blur_screen.add(quad);
 
@@ -149,7 +133,6 @@ function setupTHREE() {
     rendertarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    // antialiasing not working
     renderer.setPixelRatio(window.devicePixelRatio);
     document.body.appendChild(renderer.domElement);
     camera.position.z = 1;
@@ -195,13 +178,10 @@ async function init() {
         setupTHREE();
         setupPhysics();
 
-        // 2. Load the textures
         const textureLoader = new THREE.TextureLoader();
         const casette = textureLoader.load('resources/tissuecaset.png');
-        // 3. Write the shader code
         const { vertexShader, firstPassFrag,secondPassFrag } = await loadShaders();
 
-        // 4. Create a firstShader
         firstShader = new THREE.ShaderMaterial({
             vertexShader: vertexShader,
             fragmentShader: firstPassFrag,
@@ -247,81 +227,55 @@ async function init() {
             let wall = Matter.Bodies.rectangle(wall_pos[0],wall_pos[1], wall_width*2.5, wall_height*2.5, { isStatic: true });
             Matter.World.add(world, wall);
         }
-        // draw the lines between the points
         generateTissue();
-        document.getElementById("cornerButton").addEventListener("click", function(){ generateTissue(); });
-        document.getElementById("topBar").addEventListener("click", function(){ generateTissue(); });
+        document.getElementById("generate-tissue").addEventListener("click", function(){ generateTissue(); });
+        document.getElementById("move-tissue").addEventListener("click", function(){ Matter.Body.applyForce(tissue.polygonBody, { x: 0, y: 0 }, { x:(Math.random()-.5)*2.8, y: (Math.random()-.5)*1.0 }); });
 
-        // constrain the polygon to the screen
-
-
-        // add plane to physics
-       //let planeBody = Matter.Bodies.rectangle(0, 0, window.innerWidth, window.innerHeight, { isStatic: true });
-        //Matter.World.add(world, planeBody);
-
-
-
-        function onMouseMove(event) {
-            // Calculate the normalized device coordinates (NDC) of the mouse position
-            let mouse = new THREE.Vector2();
-            
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            // Update the position of the polygon based on the mouse position
-            polygon.position.x = mouse.x*window.innerWidth/2;
-            polygon.position.y = mouse.y * window.innerHeight/2;
-        }
-
-        function onTouchMove(event) {
-            let touch = event.touches[0];
-            let mouse = new THREE.Vector2();
-            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
-            polygon.position.x = mouse.x*window.innerWidth/2;
-            polygon.position.y = mouse.y * window.innerHeight/2;
-        }
-
-        //window.addEventListener('mousemove', onMouseMove);
-        //window.addEventListener('touchmove', onTouchMove);
-
-
-
-        
-        // 5. Create a plane mesh and add it to the scene
-        // The plane should be as wide as the window
 
         const geometry = new THREE.PlaneGeometry(window.innerWidth, window.innerHeight);
         plane = new THREE.Mesh(geometry, firstShader);
         scene.add(plane);
 
-        // Position the camera
         camera.position.z = 1;
 
-        // render matter.js objects
-
-        // Render the scene
         function animate() {
-            requestAnimationFrame(animate);
+            
             firstShader.uniforms.uTime.value += 0.01;
             secondShader.uniforms.uTime.value += 0.01;
-            // animate circle with mouse 
+
             Matter.Engine.update(engine, 200 / 60);
 
-            // update the alpha of the tissue
+
             if (tissue) {
-                tissue.polygon.material.opacity = Math.max(0.1, tissue.polygon.material.opacity - 0.0001);
+                tissue.opacity = Math.max(0.3, tissue.opacity - 0.0003);
             }
+            const opacity = document.getElementById("detected-opacity");
+
+            opacity.innerHTML = "Şeffaflık: " +   Math.round(tissue.opacity * 100) / 100;
 
             tissue.polygon.position.x = tissue.polygonBody.position.x;
             tissue.polygon.position.y = tissue.polygonBody.position.y;
             tissue.polygon.rotation.z = tissue.polygonBody.angle;
-            
+
+            const debug = document.getElementById("debug-1");
+            if (debug.checked) {
+                tissue.polygon.material.color.setHex(0xff0000);
+                tissue.polygon.material.opacity = 1.0;
+                tissue.polygon.material.transparent = false;
+            }
+            else {
+                tissue.polygon.material.color.setHex(0x010101);
+                tissue.polygon.material.opacity = tissue.opacity;
+                tissue.polygon.material.transparent = true;
+            }
             renderer.setRenderTarget(rendertarget);
             renderer.render(scene, camera);
             secondShader.uniforms.uTexture.value = rendertarget.texture;
             secondShader.uniforms.uBlurAmount.value = blur_amount;
             renderer.setRenderTarget(null);
             renderer.render(blur_screen, camera);
+            requestAnimationFrame(animate);
+
         }
         animate();
 
