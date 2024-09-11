@@ -268,6 +268,12 @@ async function init() {
                 tissue.polygon.material.opacity = tissue.opacity;
                 tissue.polygon.material.transparent = true;
             }
+            if (tissue.opacity <= 0.301) {
+                document.getElementById("center-message").style.display = "block";
+            }
+            else {
+                document.getElementById("center-message").style.display = "none";
+            }
             renderer.setRenderTarget(rendertarget);
             renderer.render(scene, camera);
             secondShader.uniforms.uTexture.value = rendertarget.texture;

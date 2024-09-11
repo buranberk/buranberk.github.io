@@ -194,6 +194,6 @@ input[type="checkbox"] {
     text-align: center;
     justify-content: center;
     font-size: 48px;
-    display: block; /* Initially hidden */
+    display: none; /* Initially hidden */
     z-index: 1001; /* Above other content */
 }
