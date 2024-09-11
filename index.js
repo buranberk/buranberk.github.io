@@ -251,7 +251,7 @@ async function init() {
             }
             const opacity = document.getElementById("detected-opacity");
 
-            opacity.innerHTML = "Şeffaflık: " +   Math.round(tissue.opacity * 100) / 100;
+            opacity.innerHTML = "Şeffaflık: " +   Math.round((1-tissue.opacity) * 100) / 100;
 
             tissue.polygon.position.x = tissue.polygonBody.position.x;
             tissue.polygon.position.y = tissue.polygonBody.position.y;

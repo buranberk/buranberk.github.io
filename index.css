@@ -181,3 +181,19 @@ input[type="checkbox"] {
         font-size: 16px;
     }
 }
+
+.center-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    justify-content: center;
+    font-size: 48px;
+    display: block; /* Initially hidden */
+    z-index: 1001; /* Above other content */
+}

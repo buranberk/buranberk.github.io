@@ -15,13 +15,13 @@
 <body>
     <div class="control-container">
         <div class="button-container">
-            <button class="button" id="generate-tissue">Yeni Doku Üret</button>
-            <button class="button" id="move-tissue">Dokuyu Hareket Ettir</button>
+            <button class="button" id="generate-tissue">Simülasyonu Yeniden Başlat</button>
+            <button class="button" id="move-tissue">Kaseti Hareket Ettir</button>
         </div>
     </div>
     <div class="prediction-window">
         <div class="prediction-header">İstatistikler</div>
-        <div id="detected-opacity">Şeffaflık: 0.5</div>
+        <div id="detected-opacity">Şeffaflık: 0.0</div>
 
         <div class="debug-options">
             <div class="debug-option">
@@ -30,6 +30,7 @@
             </div>
         </div>
     </div>
+    <div id="center-message" class="center-message">Doku çıkartılıyor</div>
     <script src="resources/packages/three.min.js"></script>
     <script src="resources/packages/matter.min.js"></script>
     <script src="index.js"></script>
